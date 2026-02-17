@@ -451,7 +451,7 @@ def scrape() -> list[Tournament]:
     list_items: list[dict[str, str]] = []
     api_items: list[dict[str, str]] = []
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
         page = browser.new_page()
 
         def on_response(response):
@@ -485,7 +485,7 @@ def scrape() -> list[Tournament]:
     seen_links: set[str] = set()
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
         detail_page = browser.new_page()
         try:
             for item in list_items:

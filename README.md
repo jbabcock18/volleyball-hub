@@ -55,12 +55,15 @@ Open:
 ## Deploy on Render
 - Build command:
 ```bash
-pip install -r requirements.txt && playwright install chromium
+pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.playwright python -m playwright install chromium
 ```
 - Start command:
 ```bash
 gunicorn app:app
 ```
+- Environment variables:
+  - `PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.playwright`
+- You can use the included `render.yaml` blueprint to avoid manual setup drift.
 
 ## Refreshing data
 - Force a fresh scrape in browser:
@@ -88,6 +91,7 @@ Response includes:
 ```bash
 playwright install chromium
 ```
+- If Render logs show `Executable doesn't exist ... ms-playwright`, your deploy skipped browser install. Re-run deploy with the build command above.
 - If cache is corrupted or outdated, remove it and refresh:
 ```bash
 rm data/tournaments.json

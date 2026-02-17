@@ -275,7 +275,7 @@ def _links_from_playwright() -> set[str]:
     links: set[str] = set()
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
+            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
             page = browser.new_page()
             try:
                 page.goto(URL, wait_until="domcontentloaded", timeout=60000)
@@ -319,7 +319,7 @@ def _scrape_details_with_playwright(links: list[str]) -> list[Tournament]:
     tournaments: list[Tournament] = []
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
+            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
             page = browser.new_page()
             try:
                 for link in links:
