@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import hmac
 import json
 from datetime import date, datetime
 from pathlib import Path
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
 
 from scrapers import Tournament, collect
 
 BASE_DIR = Path(__file__).resolve().parent
 CACHE_PATH = BASE_DIR / "data" / "tournaments.json"
+REFRESH_TOKEN = "jackiscool"
 
 app = Flask(__name__)
 
@@ -83,10 +85,34 @@ def refresh_data() -> tuple[list[Tournament], list[str], str]:
     return tournaments, errors, payload["updated_at"]
 
 
+def _read_refresh_token_from_request() -> str | None:
+    token = request.args.get("token") or request.headers.get("X-Refresh-Token")
+    if token:
+        return token
+
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        token = payload.get("token")
+        if isinstance(token, str):
+            return token
+
+    form_token = request.form.get("token")
+    return form_token if isinstance(form_token, str) else None
+
+
+def require_refresh_token() -> None:
+    supplied = _read_refresh_token_from_request()
+    if not supplied or not hmac.compare_digest(supplied, REFRESH_TOKEN):
+        abort(403, description="Invalid refresh token.")
+
+
 @app.get("/")
 def index():
     force_refresh = request.args.get("refresh") == "1"
     today = datetime.now().date()
+
+    if force_refresh:
+        require_refresh_token()
 
     if force_refresh or not CACHE_PATH.exists():
         tournaments, errors, updated_at = refresh_data()
@@ -110,6 +136,7 @@ def index():
 
 @app.post("/refresh")
 def refresh():
+    require_refresh_token()
     refresh_data()
     return redirect(url_for("index"))
 

@@ -42,6 +42,7 @@ pip install -r requirements.txt
 ```bash
 playwright install chromium
 ```
+4. Refresh token is currently hardcoded in app code as `jackiscool`.
 
 ## Run locally
 ```bash
@@ -51,9 +52,24 @@ python app.py
 Open:
 - `http://127.0.0.1:8000`
 
+## Deploy on Render
+- Build command:
+```bash
+pip install -r requirements.txt && playwright install chromium
+```
+- Start command:
+```bash
+gunicorn app:app
+```
+
 ## Refreshing data
-- Force a fresh scrape in browser: `http://127.0.0.1:8000/?refresh=1`
-- Programmatic refresh endpoint: `POST /refresh`
+- Force a fresh scrape in browser:
+  - `http://127.0.0.1:8000/?refresh=1&token=jackiscool`
+- Programmatic refresh endpoint:
+  - `POST /refresh` with one of:
+    - query string: `?token=jackiscool`
+    - header: `X-Refresh-Token: jackiscool`
+    - JSON body: `{"token":"jackiscool"}`
 
 ## API
 - `GET /api/tournaments`
@@ -67,7 +83,7 @@ Response includes:
 - Cache path: `data/tournaments.json`
 
 ## Troubleshooting
-- If results look stale, use `/?refresh=1`.
+- If results look stale, use `/?refresh=1&token=jackiscool`.
 - If VolleyballLife scrapers fail, reinstall Chromium:
 ```bash
 playwright install chromium
