@@ -1,0 +1,219 @@
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --ink: #16202a;
+  --muted: #5e6b78;
+  --accent: #0f6d8c;
+  --accent-strong: #0b566f;
+  --line: #d8e0e7;
+  --warning-bg: #fff5ea;
+  --warning-line: #ffd4a8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Avenir Next", "Nunito Sans", "Trebuchet MS", sans-serif;
+  background:
+    radial-gradient(1000px 520px at -12% -8%, #e8f1f6 0%, transparent 60%),
+    radial-gradient(820px 450px at 112% 8%, #eaf6f7 0%, transparent 58%),
+    linear-gradient(180deg, #f7f9fb 0%, #eef2f5 100%);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 1.5rem auto 2rem;
+  padding: 1.4rem;
+  background: var(--surface);
+  border: 1px solid #e3e9ee;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 39, 56, 0.08);
+}
+
+.page-header {
+  margin-bottom: 1.1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-family: "Avenir Next Condensed", "Franklin Gothic Medium", "Trebuchet MS", sans-serif;
+  font-size: clamp(1.65rem, 2.1vw, 2.45rem);
+  letter-spacing: 0.01em;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.7fr) minmax(220px, 1fr);
+  gap: 0.9rem;
+  margin: 1rem 0 0.9rem;
+  padding: 0.75rem;
+  align-items: end;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.control-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.control-field label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+button,
+input,
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.62rem 0.82rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+input::placeholder {
+  color: #7f8d99;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #9ac4d3;
+  box-shadow: 0 0 0 3px rgba(15, 109, 140, 0.14);
+}
+
+.meta {
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.errors {
+  margin-top: 0.9rem;
+  padding: 0.86rem 1rem 0.9rem;
+  border: 1px solid var(--warning-line);
+  background: var(--warning-bg);
+  border-radius: 12px;
+}
+
+.errors h2 {
+  margin: 0 0 0.42rem;
+  font-size: 1rem;
+}
+
+.errors ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.table-wrap {
+  margin-top: 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e5ebf0;
+  padding: 0.75rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-soft);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+tbody tr:hover {
+  background: #f6fbfd;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#events-table th:first-child,
+#events-table td:first-child {
+  width: 11ch;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+#events-table th:nth-child(3),
+#events-table td:nth-child(3) {
+  width: 18ch;
+}
+
+#events-table th:nth-child(4),
+#events-table td:nth-child(4) {
+  width: 14ch;
+}
+
+#events-table th:nth-child(5),
+#events-table td:nth-child(5) {
+  width: 6ch;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .container {
+    margin: 1rem 0.75rem 1.35rem;
+    padding: 1rem;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  #events-table th:nth-child(3),
+  #events-table td:nth-child(3),
+  #events-table th:nth-child(4),
+  #events-table td:nth-child(4) {
+    width: auto;
+  }
+}

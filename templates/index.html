@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Texas Beach Volleyball Tournaments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="page-header">
+        <h1>Texas Beach Volleyball Tournaments</h1>
+      </header>
+
+      <section class="controls">
+        <div class="control-field control-search">
+          <label for="search">Search</label>
+          <input id="search" type="text" placeholder="Search tournaments by name" />
+        </div>
+        <div class="control-field control-filter">
+          <label for="source-filter">Host</label>
+          <select id="source-filter">
+            <option value="">All sources</option>
+            {% for source in sources %}
+            <option value="{{ source }}">{{ source }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </section>
+
+      <p class="meta">Last updated: {{ updated_at }}</p>
+
+      {% if errors %}
+      <section class="errors">
+        <h2>Scrape Warnings</h2>
+        <ul>
+          {% for err in errors %}
+          <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      <section class="table-wrap">
+        <table id="events-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Tournament</th>
+              <th>Source</th>
+              <th>Location</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in tournaments %}
+            <tr data-title="{{ t.title|lower }}" data-source="{{ t.source }}">
+              <td>{{ t.date|display_date }}</td>
+              <td>{{ t.title }}</td>
+              <td>{{ t.source }}</td>
+              <td>{{ t.location or 'N/A' }}</td>
+              <td><a href="{{ t.link }}" target="_blank" rel="noreferrer">Open</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      const searchInput = document.getElementById("search");
+      const sourceFilter = document.getElementById("source-filter");
+      const rows = Array.from(document.querySelectorAll("#events-table tbody tr"));
+
+      function applyFilters() {
+        const q = searchInput.value.trim().toLowerCase();
+        const source = sourceFilter.value;
+
+        rows.forEach((row) => {
+          const title = row.dataset.title || "";
+          const rowSource = row.dataset.source || "";
+          const matchesSearch = !q || title.includes(q);
+          const matchesSource = !source || rowSource === source;
+          row.style.display = matchesSearch && matchesSource ? "" : "none";
+        });
+      }
+
+      searchInput.addEventListener("input", applyFilters);
+      sourceFilter.addEventListener("change", applyFilters);
+    </script>
+  </body>
+</html>
