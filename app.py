@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hmac
 import json
+import os
 from datetime import date, datetime
 from pathlib import Path
 
@@ -12,6 +13,9 @@ from scrapers import Tournament, collect
 BASE_DIR = Path(__file__).resolve().parent
 CACHE_PATH = BASE_DIR / "data" / "tournaments.json"
 REFRESH_TOKEN = "jackiscool"
+
+# Keep runtime lookup aligned with where Render build installs browsers.
+os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(BASE_DIR / ".playwright"))
 
 app = Flask(__name__)
 

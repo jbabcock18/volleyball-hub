@@ -63,6 +63,8 @@ gunicorn --timeout 300 app:app
 ```
 - Environment variables:
   - `PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.playwright`
+- Important: putting `PLAYWRIGHT_BROWSERS_PATH=...` in the build command does not persist to runtime.
+  Add it in Render service Environment settings as a real env var too.
 - You can use the included `render.yaml` blueprint to avoid manual setup drift.
 
 ## Refreshing data
