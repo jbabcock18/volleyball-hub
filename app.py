@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import hmac
 import json
-import subprocess
-import sys
 from datetime import date, datetime
 from pathlib import Path
 
@@ -81,34 +79,10 @@ def load_cache() -> tuple[list[Tournament], list[str], str | None]:
 
 def refresh_data() -> tuple[list[Tournament], list[str], str]:
     tournaments, errors = collect()
-    if _should_bootstrap_playwright(errors):
-        if _install_playwright_chromium():
-            tournaments, errors = collect()
-        else:
-            errors.append("Automatic Playwright install failed; run 'python -m playwright install chromium'.")
     payload = _serialize(tournaments, errors)
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     CACHE_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return tournaments, errors, payload["updated_at"]
-
-
-def _should_bootstrap_playwright(errors: list[str]) -> bool:
-    lowered = " ".join(errors).lower()
-    return "playwright" in lowered and "executable doesn't exist" in lowered
-
-
-def _install_playwright_chromium() -> bool:
-    try:
-        subprocess.run(
-            [sys.executable, "-m", "playwright", "install", "chromium"],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=300,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return False
-    return True
 
 
 def _read_refresh_token_from_request() -> str | None:
@@ -139,13 +113,9 @@ def index():
 
     if force_refresh:
         require_refresh_token()
-
-    if force_refresh or not CACHE_PATH.exists():
         tournaments, errors, updated_at = refresh_data()
     else:
         tournaments, errors, updated_at = load_cache()
-        if not tournaments:
-            tournaments, errors, updated_at = refresh_data()
 
     # Display only today/future tournaments while preserving full cached dataset.
     visible_tournaments = [t for t in tournaments if t.date and t.date >= today]
@@ -169,19 +139,12 @@ def refresh():
 
 @app.get("/api/tournaments")
 def tournaments_api():
-    if not CACHE_PATH.exists():
+    force_refresh = request.args.get("refresh") == "1"
+    if force_refresh:
+        require_refresh_token()
         tournaments, errors, updated_at = refresh_data()
-        return jsonify(
-            {
-                "updated_at": updated_at,
-                "errors": errors,
-                "tournaments": [t.to_dict() for t in tournaments],
-            }
-        )
-
-    tournaments, errors, updated_at = load_cache()
-    if not tournaments:
-        tournaments, errors, updated_at = refresh_data()
+    else:
+        tournaments, errors, updated_at = load_cache()
     return jsonify(
         {
             "updated_at": updated_at,
