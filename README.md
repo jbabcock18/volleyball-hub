@@ -59,10 +59,11 @@ pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/
 ```
 - Start command:
 ```bash
-gunicorn --timeout 300 app:app
+gunicorn --timeout 600 app:app
 ```
 - Environment variables:
   - `PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.playwright`
+  - `SCRAPE_USE_SUBPROCESS=1` (recommended on low-memory instances)
 - Important: putting `PLAYWRIGHT_BROWSERS_PATH=...` in the build command does not persist to runtime.
   Add it in Render service Environment settings as a real env var too.
 - You can use the included `render.yaml` blueprint to avoid manual setup drift.
@@ -94,7 +95,7 @@ Response includes:
 ```bash
 playwright install chromium
 ```
-- If Render times out during refresh, keep `gunicorn --timeout 300 app:app`.
+- If Render times out during refresh, keep `gunicorn --timeout 600 app:app`.
 - If Render logs show `Executable doesn't exist ... ms-playwright`, your deploy skipped browser install. Re-run deploy with the build command above.
 - If cache is corrupted or outdated, remove it and refresh:
 ```bash
