@@ -49,6 +49,9 @@
       </section>
 
       <p class="meta">Last updated: {{ updated_at }}</p>
+      {% if refresh_notice %}
+      <p class="refresh-notice">{{ refresh_notice }}</p>
+      {% endif %}
 
       {% if errors %}
       <section class="errors">
