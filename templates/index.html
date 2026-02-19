@@ -18,13 +18,24 @@
           <input id="search" type="text" placeholder="Search tournaments by name" />
         </div>
         <div class="control-field control-filter">
-          <label for="source-filter">Host</label>
-          <select id="source-filter">
-            <option value="">All sources</option>
-            {% for source in sources %}
-            <option value="{{ source }}">{{ source }}</option>
-            {% endfor %}
-          </select>
+          <label for="source-toggle">Hosts</label>
+          <div class="multi-select" id="source-filter">
+            <button id="source-toggle" class="multi-select-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+              All sources
+            </button>
+            <div id="source-menu" class="multi-select-menu" hidden>
+              <label class="multi-select-option">
+                <input id="all-sources" type="checkbox" checked />
+                <span>All sources</span>
+              </label>
+              {% for source in sources %}
+              <label class="multi-select-option">
+                <input class="source-checkbox" type="checkbox" value="{{ source }}" />
+                <span>{{ source }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -70,23 +81,90 @@
     <script>
       const searchInput = document.getElementById("search");
       const sourceFilter = document.getElementById("source-filter");
+      const sourceToggle = document.getElementById("source-toggle");
+      const sourceMenu = document.getElementById("source-menu");
+      const allSourcesCheckbox = document.getElementById("all-sources");
+      const sourceCheckboxes = Array.from(document.querySelectorAll(".source-checkbox"));
       const rows = Array.from(document.querySelectorAll("#events-table tbody tr"));
+
+      function selectedSources() {
+        return sourceCheckboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value);
+      }
+
+      function updateToggleLabel() {
+        const selected = selectedSources();
+        if (selected.length === sourceCheckboxes.length) {
+          sourceToggle.textContent = "All sources";
+          return;
+        }
+        if (selected.length === 0) {
+          sourceToggle.textContent = "No sources";
+          return;
+        }
+        if (selected.length === 1) {
+          sourceToggle.textContent = selected[0];
+          return;
+        }
+        sourceToggle.textContent = `${selected.length} sources`;
+      }
 
       function applyFilters() {
         const q = searchInput.value.trim().toLowerCase();
-        const source = sourceFilter.value;
+        const selected = selectedSources();
+        const hasSourceFilter = selected.length < sourceCheckboxes.length;
 
         rows.forEach((row) => {
           const title = row.dataset.title || "";
           const rowSource = row.dataset.source || "";
           const matchesSearch = !q || title.includes(q);
-          const matchesSource = !source || rowSource === source;
+          const matchesSource = !hasSourceFilter ? true : selected.includes(rowSource);
           row.style.display = matchesSearch && matchesSource ? "" : "none";
         });
       }
 
+      function setAllSources(checked) {
+        sourceCheckboxes.forEach((checkbox) => {
+          checkbox.checked = checked;
+        });
+        allSourcesCheckbox.checked = checked;
+      }
+
+      function syncAllSourcesCheckbox() {
+        const checkedCount = sourceCheckboxes.filter((checkbox) => checkbox.checked).length;
+        allSourcesCheckbox.checked = checkedCount === sourceCheckboxes.length;
+      }
+
+      sourceToggle.addEventListener("click", () => {
+        const open = !sourceMenu.hidden;
+        sourceMenu.hidden = open;
+        sourceToggle.setAttribute("aria-expanded", String(!open));
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!sourceFilter.contains(event.target)) {
+          sourceMenu.hidden = true;
+          sourceToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      allSourcesCheckbox.addEventListener("change", () => {
+        setAllSources(allSourcesCheckbox.checked);
+        updateToggleLabel();
+        applyFilters();
+      });
+
+      sourceCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          syncAllSourcesCheckbox();
+          updateToggleLabel();
+          applyFilters();
+        });
+      });
+
       searchInput.addEventListener("input", applyFilters);
-      sourceFilter.addEventListener("change", applyFilters);
+      setAllSources(true);
+      updateToggleLabel();
+      applyFilters();
     </script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 from collections.abc import Callable
 
 from . import atxbeach, beach210, beach512, sportsgarden, thirdcoast
@@ -33,6 +34,9 @@ def collect() -> tuple[list[Tournament], list[str]]:
             tournaments.extend(source_tournaments)
         except Exception as exc:  # noqa: BLE001
             errors.append(f"{scraper_name}: {exc}")
+        finally:
+            # Proactively reclaim memory between source scrapes for small hosts.
+            gc.collect()
 
     deduped: dict[tuple[str, str, str], Tournament] = {}
     for t in tournaments:

@@ -14,8 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent
 CACHE_PATH = BASE_DIR / "data" / "tournaments.json"
 REFRESH_TOKEN = "jackiscool"
 
-# Keep runtime lookup aligned with where Render build installs browsers.
-os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(BASE_DIR / ".playwright"))
+# Keep runtime lookup aligned with Render build installs, without breaking local dev.
+_project_playwright_path = BASE_DIR / ".playwright"
+if "PLAYWRIGHT_BROWSERS_PATH" not in os.environ and _project_playwright_path.exists():
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = str(_project_playwright_path)
 
 app = Flask(__name__)
 

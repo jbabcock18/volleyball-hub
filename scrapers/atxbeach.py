@@ -25,10 +25,29 @@ _DATE_LIKE_RE = re.compile(
     r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b",
     re.IGNORECASE,
 )
+_PLAYWRIGHT_LAUNCH_ARGS = [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-extensions",
+]
 
 
 class ScrapeDependencyError(RuntimeError):
     pass
+
+
+def _optimize_page(page) -> None:
+    page.set_default_timeout(30000)
+
+    def _handle_route(route):
+        if route.request.resource_type in {"image", "media", "font"}:
+            route.abort()
+            return
+        route.continue_()
+
+    page.route("**/*", _handle_route)
 
 
 def _canonical_link(link: str) -> str:
@@ -457,8 +476,9 @@ def scrape() -> list[Tournament]:
     raw_items: list[dict[str, str]] = []
     api_items: list[dict[str, str]] = []
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+        browser = pw.chromium.launch(headless=True, args=_PLAYWRIGHT_LAUNCH_ARGS)
         page = browser.new_page()
+        _optimize_page(page)
 
         def on_response(response):
             if response.request.resource_type not in {"xhr", "fetch"}:
@@ -491,8 +511,9 @@ def scrape() -> list[Tournament]:
     seen_links: set[str] = set()
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+        browser = pw.chromium.launch(headless=True, args=_PLAYWRIGHT_LAUNCH_ARGS)
         detail_page = browser.new_page()
+        _optimize_page(detail_page)
         try:
             for item in raw_items:
                 href = item.get("href", "")

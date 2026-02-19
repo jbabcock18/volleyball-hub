@@ -85,15 +85,73 @@ select {
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
+button {
+  cursor: pointer;
+}
+
 input::placeholder {
   color: #7f8d99;
 }
 
 input:focus,
-select:focus {
+select:focus,
+button:focus {
   outline: none;
   border-color: #9ac4d3;
   box-shadow: 0 0 0 3px rgba(15, 109, 140, 0.14);
+}
+
+.multi-select {
+  position: relative;
+}
+
+.multi-select-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.multi-select-toggle::after {
+  content: "▾";
+  color: #6f7b87;
+  font-size: 0.9rem;
+}
+
+.multi-select-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 12px 22px rgba(11, 28, 42, 0.14);
+  z-index: 10;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.multi-select-option:hover {
+  background: #f2f7fa;
+}
+
+.multi-select-option input {
+  width: auto;
+  min-height: 0;
+  margin: 0;
 }
 
 .meta {

@@ -35,12 +35,31 @@ _REQUEST_HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
+_PLAYWRIGHT_LAUNCH_ARGS = [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-extensions",
+]
 
 
 def _canonical_event_link(link: str) -> str:
     parsed = urlparse(link)
     path = parsed.path.rstrip("/")
     return urlunparse((parsed.scheme, parsed.netloc, path, "", "", ""))
+
+
+def _optimize_page(page) -> None:
+    page.set_default_timeout(30000)
+
+    def _handle_route(route):
+        if route.request.resource_type in {"image", "media", "font"}:
+            route.abort()
+            return
+        route.continue_()
+
+    page.route("**/*", _handle_route)
 
 
 def _looks_like_event_link(link: str) -> bool:
@@ -275,8 +294,9 @@ def _links_from_playwright() -> set[str]:
     links: set[str] = set()
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+            browser = pw.chromium.launch(headless=True, args=_PLAYWRIGHT_LAUNCH_ARGS)
             page = browser.new_page()
+            _optimize_page(page)
             try:
                 page.goto(URL, wait_until="domcontentloaded", timeout=60000)
                 try:
@@ -319,8 +339,9 @@ def _scrape_details_with_playwright(links: list[str]) -> list[Tournament]:
     tournaments: list[Tournament] = []
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+            browser = pw.chromium.launch(headless=True, args=_PLAYWRIGHT_LAUNCH_ARGS)
             page = browser.new_page()
+            _optimize_page(page)
             try:
                 for link in links:
                     try:
