@@ -47,6 +47,22 @@ body {
   letter-spacing: 0.01em;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #d9e4ec;
+  background: #f5f8fb;
+  flex: 0 0 auto;
+}
+
 .community-strip {
   margin-top: 0.45rem;
   display: flex;
@@ -410,6 +426,12 @@ a:hover {
     padding: 1rem;
   }
 
+  .brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+  }
+
   .controls {
     grid-template-columns: 1fr;
     gap: 0.65rem;
@@ -420,5 +442,172 @@ a:hover {
   #events-table th:nth-child(4),
   #events-table td:nth-child(4) {
     width: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .container {
+    margin: 0.7rem 0.5rem 1.1rem;
+    padding: 0.92rem;
+    border-radius: 12px;
+  }
+
+  .brand {
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  .page-header h1 {
+    font-size: clamp(1.35rem, 6vw, 1.82rem);
+    line-height: 1.18;
+  }
+
+  .community-strip {
+    margin-top: 0.44rem;
+    gap: 0.78rem;
+    font-size: 0.84rem;
+  }
+
+  .controls {
+    margin-top: 0.92rem;
+    padding: 0.82rem;
+    gap: 0.72rem;
+  }
+
+  .control-field label {
+    font-size: 0.78rem;
+  }
+
+  input,
+  button,
+  select {
+    min-height: 42px;
+    padding: 0.56rem 0.7rem;
+  }
+
+  .multi-select-menu {
+    max-height: 220px;
+  }
+
+  .meta,
+  .refresh-notice {
+    font-size: 0.84rem;
+  }
+
+  .table-wrap {
+    margin-top: 0.88rem;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  #events-table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+  }
+
+  #events-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+  }
+
+  #events-table tbody,
+  #events-table tr,
+  #events-table td {
+    display: block;
+    width: 100%;
+  }
+
+  #events-table tr {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    padding: 0.65rem 0.72rem;
+    box-shadow: 0 3px 10px rgba(13, 36, 52, 0.06);
+  }
+
+  #events-table tbody tr + tr {
+    margin-top: 0.18rem;
+  }
+
+  #events-table td {
+    border-bottom: 0;
+    padding: 0.24rem 0;
+    display: block;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.35;
+  }
+
+  #events-table td:not(:last-child) {
+    border-bottom: 1px solid #edf2f6;
+    margin-bottom: 0.38rem;
+    padding-bottom: 0.52rem;
+  }
+
+  #events-table td::before {
+    display: block;
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 0.12rem;
+  }
+
+  #events-table td[data-label="Link"] a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0.22rem 0.62rem;
+    border-radius: 999px;
+    border: 1px solid #b8d2df;
+    background: #f3fbff;
+    text-decoration: none;
+  }
+
+  #events-table th:first-child,
+  #events-table td:first-child,
+  #events-table th:nth-child(3),
+  #events-table td:nth-child(3),
+  #events-table th:nth-child(4),
+  #events-table td:nth-child(4),
+  #events-table th:nth-child(5),
+  #events-table td:nth-child(5) {
+    width: auto;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    margin: 0.55rem 0.35rem 0.9rem;
+    padding: 0.74rem;
+  }
+
+  .controls {
+    padding: 0.68rem;
+  }
+
+  .community-strip {
+    gap: 0.62rem;
+  }
+
+  #events-table tr {
+    padding: 0.56rem 0.62rem;
+  }
+
+  #events-table {
+    border-spacing: 0 0.9rem;
   }
 }
