@@ -10,6 +10,15 @@
     <main class="container">
       <header class="page-header">
         <h1>Texas Beach Volleyball Tournaments</h1>
+        <section class="community-strip" aria-label="Community Actions">
+          <a class="community-link" href="https://forms.gle/sfmqGxywwAKuJEDd9" target="_blank" rel="noreferrer">Send suggestion</a>
+          <details class="email-signup">
+            <summary>Email updates</summary>
+            <div class="email-signup-panel">
+              <script async data-uid="27d4e0a620" src="https://volleyball-hub.kit.com/27d4e0a620/index.js"></script>
+            </div>
+          </details>
+        </section>
       </header>
 
       <section class="controls">
@@ -85,6 +94,8 @@
       const sourceMenu = document.getElementById("source-menu");
       const allSourcesCheckbox = document.getElementById("all-sources");
       const sourceCheckboxes = Array.from(document.querySelectorAll(".source-checkbox"));
+      const emailSignup = document.querySelector(".email-signup");
+      const emailSignupPanel = document.querySelector(".email-signup-panel");
       const rows = Array.from(document.querySelectorAll("#events-table tbody tr"));
 
       function selectedSources() {
@@ -134,6 +145,17 @@
         allSourcesCheckbox.checked = checkedCount === sourceCheckboxes.length;
       }
 
+      function ensureKitSubmitLabel() {
+        if (!emailSignupPanel) return;
+        const submitButtons = emailSignupPanel.querySelectorAll(".formkit-submit");
+        submitButtons.forEach((button) => {
+          const label = (button.textContent || "").trim();
+          if (!label) {
+            button.textContent = "Subscribe";
+          }
+        });
+      }
+
       sourceToggle.addEventListener("click", () => {
         const open = !sourceMenu.hidden;
         sourceMenu.hidden = open;
@@ -144,6 +166,9 @@
         if (!sourceFilter.contains(event.target)) {
           sourceMenu.hidden = true;
           sourceToggle.setAttribute("aria-expanded", "false");
+        }
+        if (emailSignup && emailSignup.open && !emailSignup.contains(event.target)) {
+          emailSignup.open = false;
         }
       });
 
@@ -161,10 +186,16 @@
         });
       });
 
+      if (emailSignupPanel) {
+        const observer = new MutationObserver(() => ensureKitSubmitLabel());
+        observer.observe(emailSignupPanel, { childList: true, subtree: true });
+      }
+
       searchInput.addEventListener("input", applyFilters);
       setAllSources(true);
       updateToggleLabel();
       applyFilters();
+      ensureKitSubmitLabel();
     </script>
   </body>
 </html>
