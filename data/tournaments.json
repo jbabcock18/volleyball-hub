@@ -1,21 +1,7 @@
 {
-  "updated_at": "2026-02-21T18:47:10.583199Z",
+  "updated_at": "2026-02-22T05:50:54.829941Z",
   "errors": [],
   "tournaments": [
-    {
-      "title": "Buckley Pop-Up Blind Draw - Check in 11:30am - Noon start (TEAMS)",
-      "source": "Sports Garden DFW",
-      "link": "https://cvb.volleyballlife.com/event/35677",
-      "date": "2026-02-07",
-      "location": "Dallas-Fort Worth, TX"
-    },
-    {
-      "title": "Tournament: February Birthdays Blind Draw 4s Tournament",
-      "source": "ATX Beach",
-      "link": "https://atxbeach.volleyballlife.com/event/34470",
-      "date": "2026-02-07",
-      "location": "Austin, TX"
-    },
     {
       "title": "ATX Recruiting Showcase",
       "source": "ATX Beach",
@@ -115,13 +101,6 @@
       "location": "Dallas-Fort Worth, TX"
     },
     {
-      "title": "PLAYOFFS Polar Beer Wed KQOTB",
-      "source": "Sports Garden DFW",
-      "link": "https://cvb.volleyballlife.com/event/36113",
-      "date": "2026-02-25",
-      "location": "Dallas-Fort Worth, TX"
-    },
-    {
       "title": "AVPNext $10K Sideout",
       "source": "Third Coast VB",
       "link": "https://volleyballlife.com/tournament/34540",
@@ -154,6 +133,13 @@
       "source": "512 Beach",
       "link": "https://512beach.com/events/1088",
       "date": "2026-02-28",
+      "location": "Austin, TX"
+    },
+    {
+      "title": "Coed BB (JUST ADDED)",
+      "source": "512 Beach",
+      "link": "https://512beach.com/events/1114",
+      "date": "2026-03-01",
       "location": "Austin, TX"
     },
     {

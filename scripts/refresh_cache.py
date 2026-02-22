@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,11 +18,15 @@ LOCK_PATH = Path(os.getenv("REFRESH_LOCK_PATH", str(ROOT / "data" / "refresh.loc
 ERROR_LOG_PATH = ROOT / "data" / "refresh_error.log"
 
 
+def _utc_now_isoz() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 def main() -> int:
     try:
         tournaments, errors = collect()
         payload = {
-            "updated_at": datetime.utcnow().isoformat() + "Z",
+            "updated_at": _utc_now_isoz(),
             "errors": errors,
             "tournaments": [t.to_dict() for t in tournaments],
         }

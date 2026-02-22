@@ -106,11 +106,24 @@ curl -X POST "https://your-app.onrender.com/api/push-cache" \
 ## Laptop daily cron (scrape + push)
 - Script: `scripts/daily_push.sh`
 - Cron entry (installed):
-  - `15 0 * * * /Users/jackbabcock/Desktop/tournament-hub/scripts/daily_push.sh >> /Users/jackbabcock/Desktop/tournament-hub/data/daily_push.log 2>&1`
+  - `TZ=America/Chicago`
+  - `0 18 * * * /Users/jackbabcock/Desktop/tournament-hub/scripts/daily_push.sh >> /Users/jackbabcock/Desktop/tournament-hub/data/daily_push.log 2>&1`
 - Token lookup order:
   1. `TOURNAMENT_HUB_PUSH_TOKEN` env var
   2. `data/push_token` file
   3. `~/.config/tournament-hub/push_token` file
+- Manual run:
+```bash
+/Users/jackbabcock/Desktop/tournament-hub/scripts/daily_push.sh
+```
+- Logs:
+```bash
+tail -n 80 /Users/jackbabcock/Desktop/tournament-hub/data/daily_push.log
+```
+- Follow logs live:
+```bash
+tail -f /Users/jackbabcock/Desktop/tournament-hub/data/daily_push.log
+```
 
 ## Data file
 - Cache path: `data/tournaments.json`

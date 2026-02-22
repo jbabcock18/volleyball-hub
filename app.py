@@ -8,6 +8,7 @@ import sys
 import time
 from datetime import date, datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
 
@@ -27,6 +28,11 @@ if "PLAYWRIGHT_BROWSERS_PATH" not in os.environ and _project_playwright_path.exi
     os.environ["PLAYWRIGHT_BROWSERS_PATH"] = str(_project_playwright_path)
 
 app = Flask(__name__)
+APP_TZ = ZoneInfo("America/Chicago")
+
+
+def _utc_now_isoz() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _format_month_day_year(value: date) -> str:
@@ -41,10 +47,12 @@ def _format_updated_at(value: str | None) -> str:
     except ValueError:
         return value
 
-    hour = parsed.strftime("%I").lstrip("0") or "12"
-    formatted = f"{parsed.strftime('%b')} {parsed.day}, {parsed.year} at {hour}:{parsed.strftime('%M')} {parsed.strftime('%p')}"
-    if value.endswith("Z"):
-        formatted += " UTC"
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    local = parsed.astimezone(APP_TZ)
+
+    hour = local.strftime("%I").lstrip("0") or "12"
+    formatted = f"{local.strftime('%b')} {local.day}, {local.year} at {hour}:{local.strftime('%M')} {local.strftime('%p')} {local.strftime('%Z')}"
     return formatted
 
 
@@ -55,7 +63,7 @@ def display_date(value: date | None) -> str:
 
 def _serialize(tournaments: list[Tournament], errors: list[str]) -> dict:
     return {
-        "updated_at": datetime.utcnow().isoformat() + "Z",
+        "updated_at": _utc_now_isoz(),
         "errors": errors,
         "tournaments": [t.to_dict() for t in tournaments],
     }
@@ -146,7 +154,7 @@ def require_push_token() -> None:
 
 def _coerce_updated_at(value) -> str:
     if value is None:
-        return datetime.utcnow().isoformat() + "Z"
+        return _utc_now_isoz()
     if not isinstance(value, str):
         raise ValueError("updated_at must be a string when provided.")
 
@@ -244,7 +252,7 @@ def _acquire_refresh_lock() -> bool:
         return False
 
     with os.fdopen(fd, "w", encoding="utf-8") as lock_file:
-        lock_file.write(f"{os.getpid()} {datetime.utcnow().isoformat()}Z\n")
+        lock_file.write(f"{os.getpid()} {_utc_now_isoz()}\n")
     return True
 
 

@@ -10,6 +10,11 @@ TOKEN_FILE="$ROOT/data/push_token"
 ALT_TOKEN_FILE="$HOME/.config/tournament-hub/push_token"
 PUSH_URL="${TOURNAMENT_HUB_PUSH_URL:-https://volleyball-hub.onrender.com/api/push-cache}"
 PUSH_TOKEN="${TOURNAMENT_HUB_PUSH_TOKEN:-}"
+RESPONSE_FILE="$ROOT/data/push_response.json"
+
+log() {
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*"
+}
 
 if [[ -z "$PUSH_TOKEN" && -f "$TOKEN_FILE" ]]; then
   PUSH_TOKEN="$(tr -d '\r\n' < "$TOKEN_FILE")"
@@ -19,23 +24,42 @@ if [[ -z "$PUSH_TOKEN" && -f "$ALT_TOKEN_FILE" ]]; then
 fi
 
 if [[ -z "$PUSH_TOKEN" ]]; then
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] missing push token; set TOURNAMENT_HUB_PUSH_TOKEN or create $TOKEN_FILE"
+  log "missing push token; set TOURNAMENT_HUB_PUSH_TOKEN or create $TOKEN_FILE"
   exit 1
 fi
 
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] push already running; exiting"
+  log "push already running; exiting"
   exit 0
 fi
-trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
+cleanup() {
+  local exit_code=$?
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+  if [[ $exit_code -ne 0 ]]; then
+    log "job failed (exit=$exit_code)"
+  fi
+}
+trap cleanup EXIT
 
 cd "$ROOT"
 
+log "job started"
 "$PYTHON_BIN" "$ROOT/scripts/refresh_cache.py"
+if [[ ! -s "$DATA_FILE" ]]; then
+  log "missing or empty $DATA_FILE after refresh"
+  exit 1
+fi
 
-"$CURL_BIN" -fsS -X POST "$PUSH_URL" \
+http_code="$("$CURL_BIN" -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST "$PUSH_URL" \
   -H "Authorization: Bearer $PUSH_TOKEN" \
   -H "Content-Type: application/json" \
-  --data-binary "@$DATA_FILE" >/dev/null
+  --data-binary "@$DATA_FILE")"
 
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] scrape+push complete"
+response_compact="$(tr '\n' ' ' < "$RESPONSE_FILE" | sed 's/[[:space:]]\+/ /g' | cut -c1-400)"
+if [[ "$http_code" != 2* ]]; then
+  log "push failed: http=$http_code response=$response_compact"
+  exit 1
+fi
+
+log "push succeeded: http=$http_code response=$response_compact"
+log "job complete"
