@@ -22,6 +22,7 @@ _SOURCE_SPECS: tuple[tuple[str, str, Scraper], ...] = (
     ("Sports Garden DFW", "sportsgarden", sportsgarden.scrape),
     ("Third Coast VB", "thirdcoast", thirdcoast.scrape),
 )
+_SOURCE_TIMEOUT_SECONDS = int(os.getenv("SCRAPE_SOURCE_TIMEOUT_SECONDS", "180"))
 
 
 def _truthy(value: str | None) -> bool:
@@ -53,13 +54,16 @@ def _decode_tournaments(payload: dict) -> list[Tournament]:
 
 
 def _collect_source_in_subprocess(source_key: str) -> list[Tournament]:
-    completed = subprocess.run(
-        [sys.executable, str(_SCRIPT_PATH), source_key],
-        capture_output=True,
-        text=True,
-        timeout=360,
-        check=False,
-    )
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(_SCRIPT_PATH), source_key],
+            capture_output=True,
+            text=True,
+            timeout=_SOURCE_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"timed out after {_SOURCE_TIMEOUT_SECONDS}s") from exc
     if completed.returncode != 0:
         detail = (completed.stderr or completed.stdout).strip()
         message = detail or f"subprocess exited with status {completed.returncode}"

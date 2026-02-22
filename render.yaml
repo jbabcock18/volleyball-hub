@@ -11,3 +11,9 @@ services:
         value: /opt/render/project/src/.playwright
       - key: SCRAPE_USE_SUBPROCESS
         value: "1"
+      - key: ENABLE_RUNTIME_REFRESH
+        value: "0"
+      - key: REFRESH_LOCK_STALE_SECONDS
+        value: "1200"
+      - key: SCRAPE_SOURCE_TIMEOUT_SECONDS
+        value: "180"

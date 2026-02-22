@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 # data/tournaments.json
+data/push_token
+data/daily_push.log
+data/refresh_error.log
